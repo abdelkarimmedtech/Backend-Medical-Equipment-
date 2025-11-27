@@ -22,6 +22,8 @@ const userRoutes = require("./routes/userRoutes");
 // You can keep productRoutes commented for now if you want
 // app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
+
 
 // MongoDB connection
 mongoose
