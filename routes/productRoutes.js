@@ -3,45 +3,48 @@ const router = express.Router();
 const Product = require("../models/Product");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 
-// Create product (Admin only)
-router.post("/", protect, adminOnly, async (req, res) => {
+// GET all products
+router.get("/", async (req, res) => {
   try {
-    const product = new Product(req.body);
-    await product.save();
-    res.status(201).json({ message: "Product created", product });
+    const products = await Product.find();
+    res.status(200).json(products);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Get all products
-router.get("/", async (req, res) => {
-  const products = await Product.find();
-  res.json(products);
-});
-
-// Get single product by ID
+// GET product by ID
 router.get("/:id", async (req, res) => {
-  const product = await Product.findById(req.params.id);
-  if (!product) return res.status(404).json({ message: "Product not found" });
-  res.json(product);
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    res.status(200).json(product);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Update product
+// UPDATE product (Admin only)
 router.put("/:id", protect, adminOnly, async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json({ message: "Product updated", product });
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!updatedProduct) return res.status(404).json({ message: "Product not found" });
+    res.status(200).json({ message: "Product updated", product: updatedProduct });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Delete product
+// DELETE product (Admin only)
 router.delete("/:id", protect, adminOnly, async (req, res) => {
   try {
-    await Product.findByIdAndDelete(req.params.id);
-    res.json({ message: "Product deleted" });
+    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+    if (!deletedProduct) return res.status(404).json({ message: "Product not found" });
+    res.status(200).json({ message: "Product deleted" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
