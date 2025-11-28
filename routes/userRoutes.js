@@ -33,7 +33,7 @@ router.post("/register", async (req, res) => {
 
     return res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    console.error("❌ Registration error:", error);
+    console.error("Registration error:", error);
     return res.status(500).json({ error: error.message });
   }
 });
@@ -75,7 +75,7 @@ router.post("/login", async (req, res) => {
       user: userData,
     });
   } catch (error) {
-    console.error("❌ Login error:", error);
+    console.error("Login error:", error);
     return res.status(500).json({ error: error.message });
   }
 });
