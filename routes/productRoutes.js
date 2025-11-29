@@ -35,7 +35,7 @@ router.get("/:id", async (req, res) => {
 // ===============================
 router.post("/", protect, adminOnly, async (req, res) => {
   try {
-    const { name, description, price, stock, image } = req.body;
+    const { name, description, price, stock, image, category  } = req.body;
 
     // Validation
     if (!name || !description || !price || !stock) {
@@ -50,6 +50,7 @@ router.post("/", protect, adminOnly, async (req, res) => {
       price,
       stock,
       image: image || "https://via.placeholder.com/250", // Default image
+      category: category || "Other", // 🟢 This allows correct saving,
     });
 
     res
