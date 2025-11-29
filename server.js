@@ -4,26 +4,22 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 
 dotenv.config();
-
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(cors());
 
-// 🔹 Simple test route
-app.get("/test", (req, res) => {
-  res.json({ message: "Test route is working!" });
-});
+// Test route
+app.get("/test", (req, res) => res.json({ message: "Test route is working!" }));
 
-// Routes
+// Import routes
 const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
-// You can keep productRoutes commented for now if you want
-// app.use("/api/products", productRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/products", productRoutes);
 
+// Apply routes
+app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);  // MUST be active
 
 // MongoDB connection
 mongoose
@@ -33,6 +29,4 @@ mongoose
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
-  console.log(`✔ Server running on http://localhost:${PORT}`)
-);
+app.listen(PORT, () => console.log(`✔ Server running on http://localhost:${PORT}`));
