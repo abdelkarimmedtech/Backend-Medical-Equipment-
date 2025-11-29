@@ -1,4 +1,3 @@
-// routes/userRoutes.js
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
@@ -11,7 +10,7 @@ const bcrypt = require("bcryptjs");
 // ===========================
 router.post("/register", async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { name, email, password, role } = req.body;
 
     // 1) Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -24,6 +23,7 @@ router.post("/register", async (req, res) => {
 
     // 3) Create user
     const user = new User({
+      name,              // <-- NOW INCLUDED
       email,
       password: hashedPassword,
       role: role || "user",
@@ -31,7 +31,15 @@ router.post("/register", async (req, res) => {
 
     await user.save();
 
-    return res.status(201).json({ message: "User registered successfully" });
+    return res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (error) {
     console.error("Registration error:", error);
     return res.status(500).json({ error: error.message });
@@ -44,7 +52,7 @@ router.post("/register", async (req, res) => {
 // ===========================
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body; // only email + password
+    const { email, password } = req.body;
 
     // 1) Find user
     const user = await User.findOne({ email });
@@ -52,27 +60,29 @@ router.post("/login", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // 2) Check password
+    // 2) Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid password" });
     }
 
-    // 3) Create token
+    // 3) Generate JWT token
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    // 4) Remove password before sending
-    const userData = user.toObject();
-    delete userData.password;
-
+    // 4) Respond with token & user info
     return res.status(200).json({
       message: "Login successful",
       token,
-      user: userData,
+      user: {
+        id: user._id,
+        name: user.name,      
+        email: user.email,
+        role: user.role || "user",
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -80,7 +90,10 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Simple test route
+// ===========================
+// TEST ROUTE
+// GET /api/users/
+// ===========================
 router.get("/", (req, res) => {
   res.json({ message: "User API working!" });
 });
