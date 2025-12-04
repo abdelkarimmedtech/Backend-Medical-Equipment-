@@ -99,4 +99,67 @@ router.delete("/:id", protect, adminOnly, async (req, res) => {
   }
 });
 
+// ===============================
+//  REDUCE STOCK (When adding to cart)
+// ===============================
+router.patch("/:id/reduce-stock", async (req, res) => {
+  try {
+    const { quantity } = req.body;
+
+    if (!quantity || quantity < 1) {
+      return res.status(400).json({ message: "Invalid quantity" });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    if (product.stock < quantity) {
+      return res.status(400).json({ 
+        message: "Sorry, we don't have enough stock available",
+        availableStock: product.stock 
+      });
+    }
+
+    product.stock -= quantity;
+    await product.save();
+
+    res.status(200).json({ 
+      message: "Stock reduced successfully", 
+      product 
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ===============================
+//  INCREASE STOCK (When removing from cart)
+// ===============================
+router.patch("/:id/increase-stock", async (req, res) => {
+  try {
+    const { quantity } = req.body;
+
+    if (!quantity || quantity < 1) {
+      return res.status(400).json({ message: "Invalid quantity" });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    product.stock += quantity;
+    await product.save();
+
+    res.status(200).json({ 
+      message: "Stock increased successfully", 
+      product 
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
