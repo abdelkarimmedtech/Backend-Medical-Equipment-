@@ -6,22 +6,22 @@ const cors = require("cors");
 dotenv.config();
 const app = express();
 
-// Middleware
+
 app.use(express.json());
 app.use(cors());
 
-// Test route
+
 app.get("/test", (req, res) => res.json({ message: "Test route is working!" }));
 
-// Import routes
+
 const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
 
-// Apply routes
+
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);  // MUST be active
 
-// MongoDB connection
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✔ Database connected successfully"))

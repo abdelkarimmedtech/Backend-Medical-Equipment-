@@ -30,14 +30,12 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// ===============================
-//  ADD PRODUCT (ADMIN ONLY)
-// ===============================
+
 router.post("/", protect, adminOnly, async (req, res) => {
   try {
     const { name, description, price, stock, image, category  } = req.body;
 
-    // Validation
+    
     if (!name || !description || !price || !stock) {
       return res
         .status(400)
@@ -49,8 +47,8 @@ router.post("/", protect, adminOnly, async (req, res) => {
       description,
       price,
       stock,
-      image: image || "https://via.placeholder.com/250", // Default image
-      category: category || "Other", // 🟢 This allows correct saving,
+      image: image || "https://via.placeholder.com/250", 
+      category: category || "Other", 
     });
 
     res
@@ -61,9 +59,7 @@ router.post("/", protect, adminOnly, async (req, res) => {
   }
 });
 
-// ===============================
-//  UPDATE PRODUCT (ADMIN ONLY)
-// ===============================
+
 router.put("/:id", protect, adminOnly, async (req, res) => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -83,9 +79,7 @@ router.put("/:id", protect, adminOnly, async (req, res) => {
   }
 });
 
-// ===============================
-//  DELETE PRODUCT (ADMIN ONLY)
-// ===============================
+
 router.delete("/:id", protect, adminOnly, async (req, res) => {
   try {
     const deletedProduct = await Product.findByIdAndDelete(req.params.id);
@@ -99,9 +93,7 @@ router.delete("/:id", protect, adminOnly, async (req, res) => {
   }
 });
 
-// ===============================
-//  REDUCE STOCK (When adding to cart)
-// ===============================
+
 router.patch("/:id/reduce-stock", async (req, res) => {
   try {
     const { quantity } = req.body;
@@ -134,9 +126,7 @@ router.patch("/:id/reduce-stock", async (req, res) => {
   }
 });
 
-// ===============================
-//  INCREASE STOCK (When removing from cart)
-// ===============================
+
 router.patch("/:id/increase-stock", async (req, res) => {
   try {
     const { quantity } = req.body;
